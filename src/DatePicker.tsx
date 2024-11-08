@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { SlCalender } from "react-icons/sl";
+import { MdClear } from "react-icons/md";
 import { useEffect, useState } from "react";
 import Calender from "./Calender";
 import { Months } from "./constants";
@@ -12,6 +13,9 @@ const DatePicker = () => {
     value: new Date().getMonth(),
     label: Months[new Date().getMonth()],
   });
+  const [backwardMonth, setBackwardMonth] = useState<number>(
+    new Date().getMonth()
+  );
   const [enteredYear, setEnteredYear] = useState<string>(
     new Date().getFullYear().toString()
   );
@@ -19,10 +23,11 @@ const DatePicker = () => {
   const [endDate, setEndDate] = useState<number>(0);
 
   useEffect(() => {
-
     if (startDate !== 0) {
       setSelectedStartDate(
-        `${startDate}/${selectedMonth.value + 1}/${enteredYear}`
+        `${startDate}/${
+          backwardMonth !== 0 ? backwardMonth + 1 : selectedMonth.value + 1
+        }/${enteredYear}`
       );
     }
     if (endDate !== 0) {
@@ -32,6 +37,20 @@ const DatePicker = () => {
     }
   }, [selectedMonth, enteredYear, startDate, endDate]);
 
+  const onClear = (event: React.MouseEvent<SVGElement, MouseEvent>) => {
+    event.stopPropagation();
+    setSelectedEndDate("--");
+    setSelectedStartDate("--");
+    setBackwardMonth(0);
+    setEndDate(0);
+    setStartDate(0);
+    setSelectedMonth({
+      value: new Date().getMonth(),
+      label: Months[new Date().getMonth()],
+    });
+    setEnteredYear(new Date().getFullYear().toString());
+  };
+
   return (
     <Wrapper>
       <DatePickerWrapper
@@ -40,12 +59,14 @@ const DatePicker = () => {
         <span>
           {selectedStartDate} To {selectedEndDate}
         </span>
-        <SlCalender />
+        {selectedStartDate === "--" && selectedEndDate === "--" ? (
+          <SlCalender />
+        ) : (
+          <MdClear onClick={(e) => onClear(e)} />
+        )}
       </DatePickerWrapper>
       {isCalenderVisible && (
         <Calender
-          setSelectedStartDate={setSelectedStartDate}
-          setSelectedEndDate={setSelectedEndDate}
           selectedMonth={selectedMonth}
           setSelectedMonth={setSelectedMonth}
           enteredYear={enteredYear}
@@ -55,6 +76,7 @@ const DatePicker = () => {
           endDate={endDate}
           setEndDate={setEndDate}
           setIsCalenderVisible={setIsCalenderVisible}
+          setBackwardMonth={setBackwardMonth}
         ></Calender>
       )}
     </Wrapper>

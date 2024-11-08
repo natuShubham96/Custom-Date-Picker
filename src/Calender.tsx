@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Select from "react-select";
-import { Days, MonthOptions } from "./constants";
+import { Days, MonthOptions, Months, Options } from "./constants";
 import { useEffect, useState } from "react";
 import { generateCalendar } from "./utils";
 
@@ -14,8 +14,6 @@ const customStyles = {
 };
 
 interface Props {
-  setSelectedStartDate: (arg0: string) => void;
-  setSelectedEndDate: (arg0: string) => void;
   selectedMonth: any;
   setSelectedMonth: Function;
   enteredYear: string;
@@ -25,11 +23,10 @@ interface Props {
   endDate: number;
   setEndDate: (arg0: number) => void;
   setIsCalenderVisible: (arg0: boolean) => void;
+  setBackwardMonth: (arg0: number) => void;
 }
 
 const Calender = ({
-  setSelectedStartDate,
-  setSelectedEndDate,
   selectedMonth,
   setSelectedMonth,
   enteredYear,
@@ -39,6 +36,7 @@ const Calender = ({
   endDate,
   setEndDate,
   setIsCalenderVisible,
+  setBackwardMonth,
 }: Props) => {
   const [generatedCalender, setGeneratedCalender] = useState<any>([]);
   const [hoveredDate, setHoveredDate] = useState<number>(0);
@@ -81,24 +79,33 @@ const Calender = ({
   };
 
   const onOptionsClick = (option: string) => {
+    const today = new Date();
     if (option === "today") {
-      setStartDate(new Date().getDate());
-      setEndDate(new Date().getDate());
-      setIsCalenderVisible(false);
+      setStartDate(today.getDate());
+      setEndDate(today.getDate());
+      setBackwardMonth(0);
+      setSelectedMonth({
+        value: today.getMonth(),
+        label: Months[today.getMonth()],
+      });
     } else if (option === "yesterday") {
-      setStartDate(new Date().getDate() - 1);
-      setEndDate(new Date().getDate() - 1);
-      setIsCalenderVisible(false);
+      today.setDate(today.getDate() - 1);
+      setStartDate(today.getDate());
+      setEndDate(today.getDate());
     } else if (option === "last 7 days") {
-      setStartDate(new Date().getDate() - 7);
+      today.setDate(today.getDate() - 7);
+      setStartDate(today.getDate());
+      setBackwardMonth(today.getMonth());
       setEndDate(new Date().getDate());
-      setIsCalenderVisible(false);
+      setBackwardMonth(0);
     }
     if (option === "last 30 days") {
-      setStartDate(new Date().getDate() - 30);
+      today.setDate(today.getDate() - 30);
+      setStartDate(today.getDate());
+      setBackwardMonth(today.getMonth());
       setEndDate(new Date().getDate());
-      setIsCalenderVisible(false);
     }
+    setIsCalenderVisible(false);
   };
 
   return (
@@ -155,7 +162,7 @@ const Calender = ({
             </DatesChildWrapper>
           ))}
           <OptionsWrapper>
-            {["Today", "Yesterday", "Last 7 days"].map((option) => (
+            {Options.map((option) => (
               <div
                 onClick={() => onOptionsClick(option.toLowerCase())}
                 style={{ cursor: "pointer" }}

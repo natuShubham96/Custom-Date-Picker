@@ -17,4 +17,6 @@ const MonthOptions = [
 
   const Days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-  export {MonthOptions, Months, Days};
+  const Options = ["Today", "Yesterday", "Last 7 days" , "Last 30 days"];
+
+  export {MonthOptions, Months, Days, Options};
